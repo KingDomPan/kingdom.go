@@ -1,0 +1,18 @@
+1. 系统负载 `/proc/loadavg`
+
+2. 内核最大文件数 `/proc/sys/fs/file-max`
+3. 内核分配文件数 `/proc/sys/fs/file-nr`
+4. 内核最大进程数 `/proc/sys/fs/pid-max`
+
+5. CPU信息 `/proc/cpuinfo`
+6. 进程状态 `/proc/stat`
+7. 文件系统挂载点 `/proc/mounts` 进而取到设备的块信息, inode信息, 使用率等
+8. 网络接口状态 `/proc/net/dev`
+9. 磁盘IO `/proc/diskstats`
+10.内存信息 `/proc/meminfo`
+11.网络状态 `/proc/net/netstat`
+12.端口状态 `sh -c ss -t -l -n`
+13.进程信息 `/proc/${pid}/[status|cmdline]`
+14.snmp信息 `/proc/net/snmp`
+15.socket状态 `sh -c ss -s`
+16.uptime `/proc/uptime`
