@@ -1,8 +1,9 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"fmt"
+	"io"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -14,7 +15,7 @@ func main() {
 			ssh.Password("panqd"),
 		},
 	}
-	client, err := ssh.Dial("tcp", "0.0.0.0:2022", config)
+	client, err := ssh.Dial("tcp", "127.0.0.1:22", config)
 	if err != nil {
 		panic("Failed to dial: " + err.Error())
 	}
@@ -29,10 +30,26 @@ func main() {
 
 	// Once a Session is created, you can execute a single command on
 	// the remote side using the Run method.
-	var b bytes.Buffer
-	session.Stdout = &b
-	if err := session.Run("/usr/bin/whoami"); err != nil {
+	r, w := io.Pipe()
+	session.Stdout = w
+	session.Stderr = w
+	defer r.Close()
+	defer w.Close()
+	if err := session.Start("ping -c 1 127.0.0.1"); err != nil {
 		panic("Failed to run: " + err.Error())
 	}
-	fmt.Println(b.String())
+
+	ch := make(chan struct{}, 1)
+	go func() {
+		s := bufio.NewScanner(r)
+		for s.Scan() {
+			fmt.Println(s.Text())
+		}
+		ch <- struct{}{}
+	}()
+	if err := session.Wait(); err != nil {
+		panic("Failed to run: " + err.Error())
+	}
+	w.Close()
+	<-ch
 }
